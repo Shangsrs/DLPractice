@@ -21,12 +21,12 @@ testData = list(zip(testX,testY))
 
 initNet = [1,5,1]
 net = BPNetwork.network(initNet)
-cycle = 1
-numPerCycle = 2
+cycle = 10
+numPerCycle = 10
 learnRate = 3
 net.fit(training_data,cycle,numPerCycle,learnRate)
 
-'''
+
 y = net.test(testData)
 #print("{x} - {y}".format(testX,y))
 #print(testX)
@@ -35,4 +35,4 @@ y = net.test(testData)
 #print(len(y))
 plt.scatter(testX,list(y),marker='*')
 plt.show()
-'''
+
