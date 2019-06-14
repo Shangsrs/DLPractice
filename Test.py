@@ -15,11 +15,7 @@ testX = np.random.randn(testLen,1)
 testY = [i**2 for i in testX]
 testData = list(zip(testX,testY))
 
-#plt.scatter(trainX,trainY,marker='*')
-#plt.show()
-
-
-initNet = [1,5,1]
+initNet = [1,1,1]
 net = BPNetwork.network(initNet)
 cycle = 10
 numPerCycle = 10
@@ -27,12 +23,17 @@ learnRate = 3
 net.fit(training_data,cycle,numPerCycle,learnRate)
 
 
+len = len(net.weights)
+i = [t for t in range(len)]
+
+plt.plot(i,net.weights)
+plt.plot(i,net.biases)
+plt.figure();
+
+
 y = net.test(testData)
-#print("{x} - {y}".format(testX,y))
-#print(testX)
-#print(y)
-#print(len(testX))
-#print(len(y))
 plt.scatter(testX,list(y),marker='*')
+plt.scatter(testX,testY,marker='o')
+plt.scatter(trainX,trainY,marker='<')
 plt.show()
 
