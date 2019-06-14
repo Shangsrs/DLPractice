@@ -36,9 +36,9 @@ plt.scatter(testX,testY,marker='<')
 plt.scatter(testX,reY,marker='o')
 plt.show()
 
-
 '''
-trX,trY = [vx,vy for (vx,vy) in zip(trainX,trainY)]
+
+trX,trY = vx,vy for vx,vy in zip(trainX,trainY)
 plt.scatter(trX,trY,marker='o')
 
 teX,teY = [vx,vy for (vx,vy) in zip(testX,testY)]

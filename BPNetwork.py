@@ -10,7 +10,7 @@ def text(v):
     (fn,ln,fn,text) = traceback.extract_stack()[-2]
     begin = text.find('text(')+len('text(')
     end = text.find(')',begin)
-    print("{0}".format(text[begin:end]),np.shape(v),type(v))
+    print("\n{0}".format(text[begin:end])," shape:",np.shape(v)," type:",type(v))
     print(v)
 
 def sigmod(z):
@@ -97,7 +97,6 @@ class network:
             self.weights.append(self.weight[0][0])
             self.biases.append(self.bias[0][0])
             """
-            print("after bp\n\n\n")
             text(self.weight)
             text(deltaWeight)
             text(self.weight)
@@ -146,10 +145,8 @@ class network:
 
             deltaBias[-backLayer-1] = deltaHide
             layerOut = netOut[-backLayer-2]
-   #         print("\n\n\n")
     #        text(deltaHide)
     #        text(layerOut)
-    #        print("\n\n\n")
             deltaWeight[-backLayer-1] = np.dot(deltaHide,layerOut.T)
             deltaOut = deltaHide
   #      text(deltaWeight)
