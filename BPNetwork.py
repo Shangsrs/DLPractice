@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import matplotlib.pyplot as plt
 
 #li=[np.random.randn(y,1) for y in sizes[1:]]
 
@@ -56,6 +57,15 @@ class network:
         for currCycle in range(cycle):
             batchData = [trainData[i] for i in range(currCycle*numPerCycle,
             (currCycle+1)*numPerCycle)]
+            '''
+            tDX = []
+            tDY = []
+            for (vx,vy) in batchData:
+                tDX.append(vx)
+                tDY.append(vy)
+            plt.scatter(tDX,tDY,marker='<')
+            plt.show()
+            '''
             self.training(batchData,learnRate)
                 
     def test(self,testData): 
@@ -68,10 +78,11 @@ class network:
         
     def training(self,batchData,learnRate):
         for (netIn , netTarget) in batchData:
+  #          print(netIn,end=" ")
+  #          print(netIn**2,end=" ")
+  #          print(netTarget)
             netOut = self.FeedForward(netIn)
             deltaWeight,deltaBias = self.BackProp(netIn,netOut,netTarget)
-            dw0 =[[w0] for w0 in deltaWeight[0]]
-            deltaWeight[0]=np.array(dw0)
             '''
             text(netOut)
             text(self.weight)
@@ -143,6 +154,8 @@ class network:
             deltaOut = deltaHide
   #      text(deltaWeight)
   #      text(deltaBias)
+        dw0 =[[w0] for w0 in deltaWeight[0]]
+        deltaWeight[0]=np.array(dw0)
         return deltaWeight,deltaBias
                 
                 
