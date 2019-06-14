@@ -36,9 +36,15 @@ plt.scatter(testX,testY,marker='<')
 plt.scatter(testX,reY,marker='o')
 plt.show()
 
+<<<<<<< HEAD
 '''
 
 trX,trY = vx,vy for vx,vy in zip(trainX,trainY)
+=======
+
+'''
+trX,trY = [vx,vy for (vx,vy) in zip(trainX,trainY)]
+>>>>>>> d3326913ae2530a89c0e2f7aa972e4d6e29365fc
 plt.scatter(trX,trY,marker='o')
 
 teX,teY = [vx,vy for (vx,vy) in zip(testX,testY)]
