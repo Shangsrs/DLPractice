@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>DLPractice</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.python.pydev.PyDevBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.python.pydev.pythonNature</nature>
+	</natures>
+	<variableList>
+		<variable>
+			<name>TESTDATA</name>
+			<value>file:/E:/video/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/(Part%20Two)%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E8%BF%9B%E9%98%B6/code/neural-networks-and-deep-learning</value>
+		</variable>
+	</variableList>
+</projectDescription>
