@@ -24,13 +24,13 @@ trainData = training_data[:]
 initNet = [784,30,10]
 net = bp.network(initNet)
 cycle = 1000
-numPerCycle = 50
+numPerCycle = 2
 learnRate = 5
 text(trainData)
 net.fit(trainData,cycle,numPerCycle,learnRate)
 
 #test
-testData = test_data[0:10000]
+testData = test_data[0:]
 text(testData)
 testResult = net.test(testData)
 text(testResult)
@@ -44,7 +44,7 @@ for (x,y) in zip(testResult,testTarget):
         testR +=1
 print("\nTest Result: {0} / {1}".format(testR,len(testData)))
 
-'''
+
 #Show Figure
 lenWeight = len(net.weights)
 i = [t for t in range(lenWeight)]
@@ -53,5 +53,5 @@ text(net.biases)
 #plt.plot(i,net.weights)
 plt.plot(i,net.biases)
 plt.show()
-'''
+
 
