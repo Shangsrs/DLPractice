@@ -10,6 +10,27 @@ def text(v):
     print("\n{0}".format(text[begin:end])," shape:",np.shape(v)," type:",type(v))
 #    print(v)
 
+
+def drawData(trainData):
+    subfx=3
+    subfy=10
+    subIndex = 1
+    for pix,num in trainData:
+        correctNum = np.argmax(np.array(num))
+        plt.subplot(subfx,subfy,subIndex)
+        subIndex +=1
+        for i in range(28):
+            for j in range(28):
+                if pix[i*28 + j] != 0:
+                    x = j
+                    y = -i
+                    plt.scatter(x,y,c='k',marker="*")
+                    plt.xticks([])
+                    plt.yticks([])
+                    plt.title(correctNum)
+    plt.show()
+
+
 import mnist_loader
 training_data,validation_data,test_data = mnist_loader.load_data_wrapper()
 print("training data")
@@ -22,26 +43,7 @@ print(training_data[0][1].shape)
 #train
 trainData = training_data[0:20]
 
-text(trainData)
+drawData(trainData)
 
-
-subfx=3
-subfy=10
-subIndex = 1
-for pix,num in trainData:
-    correctNum = np.argmax(np.array(num))
-    plt.subplot(subfx,subfy,subIndex)
-    subIndex +=1
-    for i in range(28):
-        for j in range(28):
-            if pix[i*28 + j] != 0:
-                x = j
-                y = -i
-                plt.scatter(x,y,c='k',marker="*")
-                plt.xticks([])
-                plt.yticks([])
-                plt.title(correctNum)
-#                plt.scatter(x,y,c=pix[i*28 + j],marker="o")
-plt.show()
 
 
