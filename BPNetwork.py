@@ -29,12 +29,10 @@ def diffFunction(f):
 def diffActiveFunction(z):
     return diffSigmod(z)
 
-
-
 #f(z) = result 
 #f'(z) = f(z)(1-f(z))
 def netOutErr(target,result):
-    return target - result
+    return result - target 
 
 class network:
     def __init__(self,netTopology):
@@ -43,118 +41,66 @@ class network:
         self.bias = [np.random.randn(x,1) for x in netTopology[1:]]
         self.weights=[]
         self.biases=[]
-   #     text(self.weight)
-   #     text(self.bias)
-
-    def SGD(self,trainData,cycle,numPerCycle,learnRate,testData):
-        self.fit(self,trainData,cycle,numPerCycle,learnRate)
-        
     
     def fit(self,trainData,cycle,numPerCycle,learnRate,):
         if cycle*numPerCycle > len(trainData):
             cycle = len(trainData)//numPerCycle
         random.shuffle(trainData)
-        for currCycle in range(cycle):
-            batchData = [trainData[i] for i in range(currCycle*numPerCycle,
-            (currCycle+1)*numPerCycle)]
-            '''
-            tDX = []
-            tDY = []
-            for (vx,vy) in batchData:
-                tDX.append(vx)
-                tDY.append(vy)
-            plt.scatter(tDX,tDY,marker='<')
-            plt.show()
-            '''
+        print(len(trainData))
+        for i in range(0,len(trainData),numPerCycle):
+            batchData = trainData[i:i+numPerCycle]
             self.training(batchData,learnRate)
                 
     def test(self,testData): 
         y=[]
         for dataIn,dataOut in testData:
+            dataIn = dataIn.reshape(dataIn.shape[0],1)
             netOut = self.FeedForward(dataIn)
             y.append(netOut[-1])
         return y
 
         
     def training(self,batchData,learnRate):
+        deltaWeight = [np.zeros(w.shape) for w in self.weight]
+        deltaBias = [np.zeros(b.shape) for b in self.bias]
+  #      text(batchData)
         for (netIn , netTarget) in batchData:
-  #          print(netIn,end=" ")
-  #          print(netIn**2,end=" ")
-  #          print(netTarget)
+            netIn = netIn.reshape(netIn.shape[0],1)
+            netTarget = netTarget.reshape(netTarget.shape[0],1)
             netOut = self.FeedForward(netIn)
-            deltaWeight,deltaBias = self.BackProp(netIn,netOut,netTarget)
-            '''
-            text(netOut)
-            text(self.weight)
-            text(deltaWeight)
-            text(self.weight[0])
-            text(deltaWeight[0])
-            '''
-            self.weight = [w-learnRate*nw
-                            for w, nw in zip(self.weight, deltaWeight)]
-            self.bias = [b-learnRate*nb
-                           for b, nb in zip(self.bias, deltaBias)]
-            self.weights.append(self.weight[0][0])
-            self.biases.append(self.bias[0][0])
-            """
-            text(self.weight)
-            text(deltaWeight)
-            text(self.weight)
-            print(deltaWeight)
-            print(deltaBias)
-            """
+            deltaW,deltaB = self.BackProp(netOut,netTarget)
+            deltaWeight = [dw+pw for dw,pw in zip(deltaWeight,deltaW)]
+            deltaBias = [db+pb for db,pb in zip(deltaBias,deltaB)]
+        self.weight = [w-learnRate*nw/len(batchData)
+                        for w, nw in zip(self.weight, deltaWeight)]
+        self.bias = [b-learnRate*nb/len(batchData)
+                       for b, nb in zip(self.bias, deltaBias)]
+        self.weights.append(self.weight[-1][-1])
+        self.biases.append(self.bias[-1][-1])
             
     
     def FeedForward(self,netIn):
         netOut = []
-        netOut.append(np.array(netIn))
-        layerIn = netIn
-        for layer in range(self.size-1):
-   #         text(layerIn)
-   #         text(self.weight[layer])
-    #        text(self.bias[layer])
-            zs = np.dot(self.weight[layer],layerIn)
-            z = np.array([zi-bi for zi,bi in zip(zs,self.bias[layer])])
-#            text(z)
-            layerOut = activeFunction(z)
-            netOut.append(layerOut)
-            layerIn = layerOut
-   #     text(netOut)
+        netOut.append(netIn)
+        for w,b in zip(self.weight,self.bias):
+            z = np.dot(w,netOut[-1])+b
+            netOut.append(activeFunction(z))
+  #      text(netOut)
         return netOut
 
         
-    def BackProp(self,netIn,netOut,netTarget):
+    def BackProp(self,netOut,netTarget):
         deltaWeight = [np.zeros(w.shape) for w in self.weight]
         deltaBias = [np.zeros(b.shape) for b in self.bias]
-  #      text(netOut)
-  #      text(netTarget)
         deltaOut = np.multiply(netOutErr(netTarget,netOut[-1]),diffFunction(netOut[-1]))
-     #   text(deltaOut)
         deltaBias[-1] = deltaOut
         deltaWeight[-1] = np.dot(deltaOut,netOut[-2].T)
-     #   text(deltaBias)
-      #  text(deltaWeight)
-
         for backLayer in range(1,self.size-1):
-       #     text(self.weight)
-       #     text(deltaOut)
             deltaOut = np.dot(self.weight[-backLayer].T,deltaOut)
-       #     text(deltaOut)
-      #      text(netOut[-backLayer])
             deltaHide = np.multiply(diffFunction(netOut[-backLayer-1]),deltaOut)
-
             deltaBias[-backLayer-1] = deltaHide
             layerOut = netOut[-backLayer-2]
-    #        text(deltaHide)
-    #        text(layerOut)
             deltaWeight[-backLayer-1] = np.dot(deltaHide,layerOut.T)
             deltaOut = deltaHide
-  #      text(deltaWeight)
-  #      text(deltaBias)
-        dw0 =[[w0] for w0 in deltaWeight[0]]
-        deltaWeight[0]=np.array(dw0)
         return deltaWeight,deltaBias
                 
-                
-    
-
