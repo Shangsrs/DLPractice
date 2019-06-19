@@ -42,46 +42,59 @@ print("test_data:",len(test_data))
 print(training_data[0][0].shape)
 print(training_data[0][1].shape)
 
-#train
+#init
 trainData = training_data[:]
 initNet = [784,30,10]
-net = bp.network(initNet)
-cycle = 10000
-numPerCycle = 2
-learnRate = 5
-text(trainData)
-net.fit(trainData,cycle,numPerCycle,learnRate)
+try:
+    arr=np.load('HandBiasWeigt.npz')
+except:
+    b=[np.random.randn(x,1) for x in initNet[1:]]
+    w=[np.random.randn(y,x) for (x,y) in zip(initNet[:-1],initNet[1:])]
+else:
+    b = arr['bias']
+    w = arr['weight']
+net = bp.network(initNet,b,w)
+
+
+#train
+needTrain = False
+if needTrain:
+    cycle = 10000
+    numPerCycle = len(trainData)//cycle
+    learnRate = 5
+    net.fit(trainData,cycle,numPerCycle,learnRate)
+    np.savez("HandBiasWeigt",bias = net.bias,weight = net.weight)
 
 #test
-testData = test_data[:]
-text(testData)
-testResult = net.test(testData)
-text(testResult)
+needTest = True
+if needTest:
+    testData = test_data[:]
+    testResult = net.test(testData)
 
 #result 
-testR = 0
-testTarget = [y for (x,y) in testData]
-failTestData =[]
-failTestIndex = []
-for (x,y) in zip(testResult,testData):
-    targetIndex = np.argmax(np.array(x))
-    if targetIndex == y[1]:
-        testR +=1
-    else:   
-        failTestData.append(y)
-        failTestIndex.append(x)
-print("\nTest Result: {0} / {1}".format(testR,len(testData)))
-
-failLen = 30
-drawData(failTestIndex[:failLen],failTestData[:failLen])
+needShowResult = True
+if needShowResult:
+    testR = 0
+    testTarget = [y for (x,y) in testData]
+    failTestData =[]
+    failTestIndex = []
+    for (x,y) in zip(testResult,testData):
+        targetIndex = np.argmax(np.array(x))
+        if targetIndex == y[1]:
+            testR +=1
+        else:   
+            failTestData.append(y)
+            failTestIndex.append(x)
+    print("\nTest Result: {0} / {1}".format(testR,len(testData)))
+    failLen = 30
+#    drawData(failTestIndex[:failLen],failTestData[:failLen])
 
 #Show Figure
-lenWeight = len(net.weights)
-i = [t for t in range(lenWeight)]
-text(net.weights)
-text(net.biases)
-#plt.plot(i,net.weights)
-plt.plot(i,net.biases)
-plt.show()
+if needTrain:
+    lenWeight = len(net.weights)
+    i = [t for t in range(lenWeight)]
+    #plt.plot(i,net.weights)
+    plt.plot(i,net.biases)
+    plt.show()
 
 

@@ -35,10 +35,10 @@ def netOutErr(target,result):
     return result - target 
 
 class network:
-    def __init__(self,netTopology):
+    def __init__(self,netTopology,b,w):
         self.size = len(netTopology)
-        self.weight = [np.random.randn(y,x) for (x,y) in zip(netTopology[:-1],netTopology[1:])]
-        self.bias = [np.random.randn(x,1) for x in netTopology[1:]]
+        self.bias = b
+        self.weight = w
         self.weights=[]
         self.biases=[]
     
@@ -46,7 +46,6 @@ class network:
         if cycle*numPerCycle > len(trainData):
             cycle = len(trainData)//numPerCycle
         random.shuffle(trainData)
-        print(len(trainData))
         for i in range(0,len(trainData),numPerCycle):
             batchData = trainData[i:i+numPerCycle]
             self.training(batchData,learnRate)
