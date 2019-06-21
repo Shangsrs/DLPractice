@@ -1,4 +1,4 @@
-import BPNetwork as bp
+import BPNetwork3 as bp
 import numpy as np
 
 #draw numerical picture
@@ -57,13 +57,13 @@ net = bp.network(initNet,b,w)
 
 
 #train
-needTrain = False
+needTrain = True
 if needTrain:
     cycle = 10000
     numPerCycle = len(trainData)//cycle
     learnRate = 5
     net.fit(trainData,cycle,numPerCycle,learnRate)
-    np.savez("HandBiasWeigt",bias = net.bias,weight = net.weight)
+#    np.savez("HandBiasWeigt",bias = net.bias,weight = net.weight)
 
 #test
 needTest = True

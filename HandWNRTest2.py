@@ -40,10 +40,20 @@ print("test_data:",len(test_data))
 print(training_data[0][0].shape)
 print(training_data[0][1].shape)
 
+'''
 #train
 trainData = training_data[0:20]
-
 drawData(trainData)
+'''
+oldTrainData = training_data[:3]
+trainData = []
+for pic,target in oldTrainData:
+    p = np.array(pic).reshape(28,28)
+    li = (p,target)
+    trainData.append(li)
 
+for p,t in trainData:
+    plt.imshow(p)
+    plt.show()
 
 
