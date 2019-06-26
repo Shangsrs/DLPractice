@@ -78,11 +78,10 @@ class transFun:
 
 
 class sample:
-    def __init__(self,ks,step,kernel,bias):
-        self.kernel = kernel
+    def __init__(self,ks,step):
+        self.kernel = np.random.randn(ks[0],ks[1])
         self.step = step
         self.ks = ks
-        self.bias = bias
     def downMax(self,matrix):
         self.matrix = matrix
         self.ms = self.matrix.shape
@@ -91,7 +90,7 @@ class sample:
             for y in range(0,self.ms[1]-self.ks[1]+1,self.step):
                 mat = self.matrix[x:x+self.ks[0],y:y+self.ks[1]]
                 mat = mat * self.kernel
-                e = np.max(mat) + self.bias
+                e = np.max(mat)
                 re[(x)//self.step][(y)//self.step]=e
         return re
     def downAvg(self,matrix):
@@ -102,7 +101,7 @@ class sample:
             for y in range(0,self.ms[1]-self.ks[1]+1,self.step):
                 mat = self.matrix[x:x+self.ks[0],y:y+self.ks[1]]
                 mat = mat * self.kernel
-                e = np.average(mat) + self.bias
+                e = np.average(mat)
                 re[(x)//self.step][(y)//self.step]=e
         return re
     def upMax(self,matrix):
@@ -118,7 +117,7 @@ class sample:
                 sub = np.zeros(mat.shape)
                 rol = index // self.ks[1]
                 col = index % self.ks[1]
-                sub[rol][col] = e + self.bias
+                sub[rol][col] = e
                 re[x:x+self.ks[0],y:y+self.ks[1]] = sub
         return re
     def upAvg(self,matrix):
@@ -130,32 +129,31 @@ class sample:
                 mat = self.matrix[x:x+self.ks[0],y:y+self.ks[1]]
                 mat = mat * self.kernel
                 e = np.average(mat)
-                sub = e*np.ones(mat.shape) + self.bias
+                sub = e*np.ones(mat.shape)
                 re[x:x+self.ks[0],y:y+self.ks[1]] = sub
         return re
 
 
 class maxPool:
-    def __init__(self,ks,step,kernel,bias):
-        self.sam = sample(ks,step,kernel,bias)
+    def __init__(self,ks,step):
+        self.sam = sample(ks,step)
     def forward(self,matrix):
         return self.sam.downMax(matrix)
     def backward(self,netTarget):pass
 
 class avgPool:
-    def __init__(self,ks,step,kernel,bias):
-        self.sam = sample(ks,step,kernel,bias)
+    def __init__(self,ks,step):
+        self.sam = sample(ks,step)
     def forward(self,matrix):
         return self.sam.downAvg(matrix)
     def backward(self,netTarget):pass
 
 #convolution
 class conv:
-    def __init__(self,ks,step,kernel,bias):
+    def __init__(self,ks,step):
         self.step = step
-        self.kernel= kernel
+        self.kernel= np.random.randn(ks[0],ks[1])
         self.ks = ks
-        self.bias = bias
     def forward(self,matrix):
         self.matrix = matrix
         self.ms = self.matrix.shape
@@ -165,7 +163,7 @@ class conv:
                 mat = self.matrix[x:x+self.ks[0],y:y+self.ks[1]]
 #                mat = mat * self.reverse(kernel)
                 mat = mat * self.kernel
-                e = np.sum(mat) + self.bias
+                e = np.sum(mat)
                 re[(x)//self.step][(y)//self.step] = e
         return re
     def backward(self,netTarget):pass
@@ -191,11 +189,11 @@ def netOutErr(target,result):
     return result - target 
 
 class fullyConnected:
-    def __init__(self,netSt,learnRate,b,w):
+    def __init__(self,netSt,learnRate):
         self.size = len(netSt)
         self.learnRate = learnRate
-        self.bias = b
-        self.weight = w
+        self.bias = [np.random.randn(y,1) for y in netSt[1:]]
+        self.weight = [np.random.randn(y,x) for x,y in zip(netSt[:-1],netSt[1:])]
         self.tf = transFun("")
         self.weights=[]
         self.biases=[]

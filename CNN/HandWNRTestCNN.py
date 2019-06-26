@@ -1,4 +1,4 @@
-import CNNNetwork2 as cnn
+import CNNCommon as cc
 import numpy as np
 
 #draw numerical picture
@@ -23,8 +23,32 @@ def drawData(failTestIndex,failTestData):
                     plt.title(str(trainData[1])+"_"+str(failIndex))
     plt.show()
 
+
+
+#result show
+def testShow(testData,testResult):
+    testR = 0
+    testTarget = [y for (x,y) in testData]
+    failTestData =[]
+    failTestIndex = []
+    for (x,y) in zip(testResult,testData):
+        targetIndex = np.argmax(np.array(x))
+        if targetIndex == y[1]:
+            testR +=1
+        else:   
+            failTestData.append(y)
+            failTestIndex.append(x)
+    print("\nTest Result: {0} / {1}".format(testR,len(testData)))
+    failLen = 30
+#    drawData(failTestIndex[:failLen],failTestData[:failLen])
+
+def netTest(testData,net):
+    testResult = net.test(testData)
+    testShow(testData,testResult)
+
 #show value
 import traceback
+
 def text(v):
     (fn,ln,fn,text) = traceback.extract_stack()[-2]
     begin = text.find('text(')+len('text(')
@@ -73,40 +97,25 @@ initNet = [784,30,10]
 
 b=[np.random.randn(x,1) for x in initNet[1:]]
 w=[np.random.randn(y,x) for (x,y) in zip(initNet[:-1],initNet[1:])]
-net = cnn.network(initNet,b,w,kernel)
+net = cc.fullyConnected(initNet,b,w,kernel)
 
 #train
 needTrain = True
-if needTrain:
-    cycle = 1000
-    numPerCycle = len(trainData)//cycle
-    learnRate = 5
-    net.fit(trainData,cycle,numPerCycle,learnRate)
-#    np.savez("HandBiasWeigt",bias = net.bias,weight = net.weight)
-
 #test
 needTest = True
-if needTest:
-    testData = test_data[:]
-    testResult = net.test(testData)
+if needTrain:
+    batchSize = 10
+    learnRate = 5
+    for i in range(30):
+        net.fit(trainData,batchSize,learnRate)
+        if needTest:
+            testData = test_data[:]
+            netTest(testData,net)
+    
+#    np.savez("HandBiasWeigt",bias = net.bias,weight = net.weight)
 
-#result 
-needShowResult = True
-if needShowResult:
-    testR = 0
-    testTarget = [y for (x,y) in testData]
-    failTestData =[]
-    failTestIndex = []
-    for (x,y) in zip(testResult,testData):
-        targetIndex = np.argmax(np.array(x))
-        if targetIndex == y[1]:
-            testR +=1
-        else:   
-            failTestData.append(y)
-            failTestIndex.append(x)
-    print("\nTest Result: {0} / {1}".format(testR,len(testData)))
-    failLen = 30
-#    drawData(failTestIndex[:failLen],failTestData[:failLen])
+
+
 
 #Show Figure
 if needTrain:

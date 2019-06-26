@@ -1,4 +1,4 @@
-import BPNetwork3 as bp
+import BPNetwork as bp
 import numpy as np
 
 #draw numerical picture

@@ -18,13 +18,13 @@ def sigmod(z):
 
 #f'(z) = f(z)(1-f(z))
 def diffSigmod(z):
-    return np.multiply(sigmod(z),(1-sigmod(z)))
+    return sigmod(z)*(1-sigmod(z))
 
 def activeFunction(z):
     return sigmod(z)
 
 def diffFunction(f):
-    return np.multiply(f,(1-f))
+    return f*(1-f)
 
 def diffActiveFunction(z):
     return diffSigmod(z)
@@ -54,7 +54,7 @@ class network:
         y=[]
         for dataIn,dataOut in testData:
             dataIn = dataIn.reshape(dataIn.shape[0],1)
-            netOut = self.FeedForward(dataIn)
+            netIn,netOut = self.FeedForward(dataIn)
             y.append(netOut[-1])
         return y
 
@@ -63,11 +63,11 @@ class network:
         deltaWeight = [np.zeros(w.shape) for w in self.weight]
         deltaBias = [np.zeros(b.shape) for b in self.bias]
   #      text(batchData)
-        for (netIn , netTarget) in batchData:
-            netIn = netIn.reshape(netIn.shape[0],1)
+        for (x , netTarget) in batchData:
+            x = x.reshape(x.shape[0],1)
             netTarget = netTarget.reshape(netTarget.shape[0],1)
-            netOut = self.FeedForward(netIn)
-            deltaW,deltaB = self.BackProp(netOut,netTarget)
+            netIn,netOut = self.FeedForward(x)
+            deltaW,deltaB = self.BackProp(netOut,netTarget,x)
             deltaWeight = [dw+pw for dw,pw in zip(deltaWeight,deltaW)]
             deltaBias = [db+pb for db,pb in zip(deltaBias,deltaB)]
         self.weight = [w-learnRate*nw/len(batchData)
@@ -78,25 +78,27 @@ class network:
         self.biases.append(self.bias[-1][-1])
             
     
-    def FeedForward(self,netIn):
+    def FeedForward(self,x):
         netOut = []
-        netOut.append(netIn)
+        netOut.append(x)
+        netIn = [x]
         for w,b in zip(self.weight,self.bias):
             z = np.dot(w,netOut[-1])+b
+            netIn.append(z)
             netOut.append(activeFunction(z))
   #      text(netOut)
-        return netOut
+        return netIn,netOut
 
         
-    def BackProp(self,netOut,netTarget):
+    def BackProp(self,netOut,netTarget,netIn):
         deltaWeight = [np.zeros(w.shape) for w in self.weight]
         deltaBias = [np.zeros(b.shape) for b in self.bias]
-        deltaOut = np.multiply(netOutErr(netTarget,netOut[-1]),diffFunction(netOut[-1]))
+        deltaOut = netOutErr(netTarget,netOut[-1])*diffActiveFunction(netIn[-1])
         deltaBias[-1] = deltaOut
         deltaWeight[-1] = np.dot(deltaOut,netOut[-2].T)
         for backLayer in range(1,self.size-1):
             deltaOut = np.dot(self.weight[-backLayer].T,deltaOut)
-            deltaHide = np.multiply(diffFunction(netOut[-backLayer-1]),deltaOut)
+            deltaHide = diffActiveFunction(netIn[-backLayer-1])*deltaOut
             deltaBias[-backLayer-1] = deltaHide
             layerOut = netOut[-backLayer-2]
             deltaWeight[-backLayer-1] = np.dot(deltaHide,layerOut.T)
