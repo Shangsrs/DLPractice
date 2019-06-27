@@ -91,105 +91,109 @@ def dataTrans(training_data):
         target.append(y)
     return input,target
 
+def function():
+    input,target = dataTrans(training_data[:5000])
+    trainData = zip(input,target)
+    trainData = list(trainData)
 
-input,target = dataTrans(training_data[:5000])
-trainData = zip(input,target)
-trainData = list(trainData)
+    kernelShape = (3,3)
+    kernel = np.ones(kernelShape)
+    initNet = []
 
-kernelShape = (3,3)
-kernel = np.ones(kernelShape)
-initNet = []
+    p0_ks =(2,2)
+    c1_ks = (5,5)
+    s2_ks = (2,2)
+    c3_ks = (5,5)
+    s4_ks = (2,2)
+    f5_netSt = (25,10,10)
+    f5_learnRate = 5
 
-p0_ks =(2,2)
-c1_ks = (5,5)
-s2_ks = (2,2)
-c3_ks = (5,5)
-s4_ks = (2,2)
-f5_netSt = (25,10,10)
-f5_learnRate = 5
-
-try:
-    arr=np.load('CNNKernel.npz')
-except:
-    pre = 0
-    f5_b = [np.random.randn(y,1) for y in f5_netSt[1:]]
-    f5_w = [np.random.randn(y,x) for x,y in zip(f5_netSt[:-1],f5_netSt[1:])]
-else:
-    '''
-    c1_k = arr['c1k']
-    s2_k = arr['s2k']
-    c3_k = arr['c3k']
-    s4_k = arr['s4k']
-    c1_b = arr['c1b']
-    s2_b = arr['s2b']
-    c3_b = arr['c3b']
-    s4_b = arr['s4b']
-    '''
-    pre = arr['precision']
-    f5_b = arr['f5b']
-    f5_w = [arr['f5w0'],arr['f5w1']]
+    try:
+        arr=np.load('CNNKernel.npz')
+    except:
+        pre = 0
+        f5_b = [np.random.randn(y,1) for y in f5_netSt[1:]]
+        f5_w = [np.random.randn(y,x) for x,y in zip(f5_netSt[:-1],f5_netSt[1:])]
+    else:
+        '''
+        c1_k = arr['c1k']
+        s2_k = arr['s2k']
+        c3_k = arr['c3k']
+        s4_k = arr['s4k']
+        c1_b = arr['c1b']
+        s2_b = arr['s2b']
+        c3_b = arr['c3b']
+        s4_b = arr['s4b']
+        '''
+        pre = arr['precision']
+        f5_b = arr['f5b']
+        f5_w = [arr['f5w0'],arr['f5w1']]
 
 
-c1_k = np.random.randn(c1_ks[0],c1_ks[1])
-s2_k = np.random.randn(s2_ks[0],s2_ks[1])
-c3_k = np.random.randn(c3_ks[0],c3_ks[1])
-s4_k = np.random.randn(s4_ks[0],s4_ks[1])
-c1_b = np.random.randn(1,1)
-s2_b = np.random.randn(1,1)
-c3_b = np.random.randn(1,1)
-s4_b = np.random.randn(1,1)
+    c1_k = np.random.randn(c1_ks[0],c1_ks[1])
+    s2_k = np.random.randn(s2_ks[0],s2_ks[1])
+    c3_k = np.random.randn(c3_ks[0],c3_ks[1])
+    s4_k = np.random.randn(s4_ks[0],s4_ks[1])
+    c1_b = np.random.randn(1,1)
+    s2_b = np.random.randn(1,1)
+    c3_b = np.random.randn(1,1)
+    s4_b = np.random.randn(1,1)
 
-p0 = cc.padding(p0_ks,0)
-c1 = cc.conv(c1_ks,1,c1_k,c1_b)
-s2 = cc.maxPool(s2_ks,2,s2_k,s2_b)
-c3 = cc.conv(c3_ks,1,c3_k,c3_b)
-s4 = cc.maxPool(s4_ks,2,s4_k,s4_b)
+    p0 = cc.padding(p0_ks,0)
+    c1 = cc.conv(c1_ks,1,c1_k,c1_b)
+    s2 = cc.maxPool(s2_ks,2,s2_k,s2_b)
+    c3 = cc.conv(c3_ks,1,c3_k,c3_b)
+    s4 = cc.maxPool(s4_ks,2,s4_k,s4_b)
 
-f5 = cc.fullyConnected(f5_netSt,f5_learnRate,f5_b,f5_w)
-netStruct = [p0,c1,s2,c3,s4,f5]
+    f5 = cc.fullyConnected(f5_netSt,f5_learnRate,f5_b,f5_w)
+    netStruct = [p0,c1,s2,c3,s4,f5]
 
-net = cc.CNN(netStruct)
-batchSize = 10
-net.fit(trainData,batchSize)
+    net = cc.CNN(netStruct)
+    batchSize = 10
+    net.fit(trainData,batchSize)
 
-input,target = dataTrans(test_data[:100])
-testData = input
+    input,target = dataTrans(test_data[:100])
+    testData = input
 
-print("\nTest\n")
-re = net.test(testData)
+    print("\nTest\n")
+    re = net.test(testData)
 
-testR = 0
-testTarget = target
-failTestData =[]
-failTestIndex = []
-for (x,y) in zip(re,testTarget):
-    targetIndex = np.argmax(np.array(x))
-    if targetIndex == y:
-        testR +=1
-    else:   
-        failTestData.append(y)
-        failTestIndex.append(x)
-print("\nTest Result: {0} / {1}".format(testR,len(testData)))
-failLen = 30
+    testR = 0
+    testTarget = target
+    failTestData =[]
+    failTestIndex = []
+    for (x,y) in zip(re,testTarget):
+        targetIndex = np.argmax(np.array(x))
+        if targetIndex == y:
+            testR +=1
+        else:   
+            failTestData.append(y)
+            failTestIndex.append(x)
+    print("\nTest Result: {0} / {1}".format(testR,len(testData))," - ",
+    testR/len(testData))
+    failLen = 30
 
-newPre = testR/len(testData)
+    newPre = testR/len(testData)
 
-if newPre > pre:
-    print('write')
-    pre = newPre
-    np.savez("CNNKernel",c1k=c1_k,s2k=s2_k,c3k=c3_k,s4k=s4_k,
-    c1b=c1_b,s2b=s2_b,c3b=c3_b,s4b=s4_b,precision=pre,
-    f5b=net.netStruct[-1].bias, f5w0=net.netStruct[-1].weight[0],
-    f5w1=net.netStruct[-1].weight[1])
+    if newPre > pre:
+        print('write')
+        pre = newPre
+        np.savez("CNNKernel",c1k=c1_k,s2k=s2_k,c3k=c3_k,s4k=s4_k,
+        c1b=c1_b,s2b=s2_b,c3b=c3_b,s4b=s4_b,precision=pre,
+        f5b=net.netStruct[-1].bias, f5w0=net.netStruct[-1].weight[0],
+        f5w1=net.netStruct[-1].weight[1])
 
 
 #Show Figure
-needTrain = False
-if needTrain:
-    lenWeight = len(net.netStruct[-1].weights)
-    i = [t for t in range(lenWeight)]
+    needTrain = False
+    if needTrain:
+        lenWeight = len(net.netStruct[-1].weights)
+        i = [t for t in range(lenWeight)]
 #    plt.plot(i,net.netStruct[-1].weights)
 #    plt.show()
-    plt.plot(i,net.netStruct[-1].biases)
-    plt.show()
+        plt.plot(i,net.netStruct[-1].biases)
+        plt.show()
 
+for i in range(400):
+    print("Epochs %s"%i)
+    function()

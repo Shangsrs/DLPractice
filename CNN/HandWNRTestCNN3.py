@@ -54,7 +54,7 @@ def text(v):
     begin = text.find('text(')+len('text(')
     end = text.find(')',begin)
     print("\n{0}".format(text[begin:end])," shape:",np.shape(v)," type:",type(v))
-#    print(v)
+    print(v)
 
 #loader handwritten numerical data
 import mnist_loader
@@ -139,7 +139,7 @@ netStruct = [p0,c1,s2,c3,s4,f5]
 net = cc.CNN(netStruct)
 batchSize = 10
 
-input,target = dataTrans(test_data[1000:2000])
+input,target = dataTrans(test_data[1000:])
 testData = input
 
 print("\nTest\n")
@@ -156,18 +156,18 @@ for (x,y) in zip(re,testTarget):
     else:   
         failTestData.append(y)
         failTestIndex.append(x)
-print("\nTest Result: {0} / {1}".format(testR,len(testData)))
+print("\nTest Result: {0} / {1}".format(testR,len(testData))," - ",
+testR/len(testData))
 failLen = 30
 
-newPre = testR/len(testData)
+parameters = [c1_k,s2_k,c3_k,s4_k,c1_b,s2_b,c3_b,s4_b,pre,f5_b, f5_w]
 
-if newPre > pre:
-    pre = newPre
-    np.savez("CNNKernel",c1k=c1_k,s2k=s2_k,c3k=c3_k,s4k=s4_k,
-    c1b=c1_b,s2b=s2_b,c3b=c3_b,s4b=s4_b,precision=pre,
-    f5b=net.netStruct[-1].bias, f5w0=net.netStruct[-1].weight[0],
-    f5w1=net.netStruct[-1].weight[1])
-
+'''
+for x in parameters:
+#    x = np.array(x)
+#    text(x)
+    print(x)
+'''
 
 #Show Figure
 needTrain = False

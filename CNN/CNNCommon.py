@@ -13,7 +13,6 @@ def text(v):
     end = text.find(')',begin)
     print("\n{0}".format(text[begin:end])," shape:",np.shape(v)," type:",type(v))
 #    print(v)
-
 class transFun:
     def __init__(self,name = "sigmod"):
         self.funName = name
@@ -75,8 +74,6 @@ class transFun:
         expZ = np.exp(z)
         expPz = np.exp(-z)
         return ((expZ+expPz)**2-(expZ-expPz)**2)/(expZ+expPz)**2
-
-
 class sample:
     def __init__(self,ks,step,kernel,bias):
         self.kernel = kernel
@@ -133,22 +130,18 @@ class sample:
                 sub = e*np.ones(mat.shape) + self.bias
                 re[x:x+self.ks[0],y:y+self.ks[1]] = sub
         return re
-
-
 class maxPool:
     def __init__(self,ks,step,kernel,bias):
         self.sam = sample(ks,step,kernel,bias)
     def forward(self,matrix):
         return self.sam.downMax(matrix)
     def backward(self,netTarget):pass
-
 class avgPool:
     def __init__(self,ks,step,kernel,bias):
         self.sam = sample(ks,step,kernel,bias)
     def forward(self,matrix):
         return self.sam.downAvg(matrix)
     def backward(self,netTarget):pass
-
 #convolution
 class conv:
     def __init__(self,ks,step,kernel,bias):
@@ -163,18 +156,18 @@ class conv:
         for x in range(0,self.ms[0]-self.ks[0]+1,self.step):
             for y in range(0,self.ms[1]-self.ks[1]+1,self.step):
                 mat = self.matrix[x:x+self.ks[0],y:y+self.ks[1]]
-#                mat = mat * self.reverse(kernel)
+                #mat = mat * self.reverse(kernel)
                 mat = mat * self.kernel
                 e = np.sum(mat) + self.bias
                 re[(x)//self.step][(y)//self.step] = e
         return re
-    def backward(self,netTarget):pass
+    def backward(self,netTarget):
+        error = netTarget - self.matrix
     def reverse(self,kernel):
         ks = kernel.shape
         len = ks[0]*ks[1]
         skernel = kernel.reshape(len,)[-1::-1]
         return skernel.reshape(ks[1],ks[0])
-
 class padding:
     def __init__(self,size,ele = 0):
         self.size = size
@@ -186,10 +179,8 @@ class padding:
         re[self.size[0]:self.size[0]+self.ms[0],self.size[1]:self.size[1]+self.ms[1]] = self.matrix
         return re
     def backward(self):pass
-
 def netOutErr(target,result):
     return result - target 
-
 class fullyConnected:
     def __init__(self,netSt,learnRate,b,w):
         self.size = len(netSt)
@@ -201,8 +192,10 @@ class fullyConnected:
         self.biases=[]
         self.netOut = []
         self.netIn = []
+        self.inputShape = (0,0)
     def forward(self,matrix):
 #        text(matrix)
+        self.inputShape = matrix.shape
         x = matrix.ravel()
         x = x.reshape(len(x),1)
         netOut = []
@@ -230,12 +223,11 @@ class fullyConnected:
             deltaOut = deltaHide
         self.weight = [w-d for w,d in zip(self.weight,deltaWeight)]
         self.bias = [b-d for b,d in zip(self.bias , deltaBias)]
-    #    text(deltaOut)
- #       return deltaOut
         self.weights.append(self.weight[-1][-1])
         self.biases.append(self.bias[-1][-1])
-
-
+        deltaOut = np.dot(self.weight[0].T,deltaOut)
+        text(deltaOut)
+        return deltaOut.reshape(self.inputShape)
 class CNN:
     def __init__(self,netStruct):
         self.netStruct = netStruct
@@ -265,8 +257,6 @@ class CNN:
             re.append(netIn)
         return re
 
-
-    
 if __name__ == "__main__":
     mat = np.random.randint(0,9,(6,6))
 #    mat = np.random.uniform(0,9,(6,6))
@@ -283,19 +273,15 @@ if __name__ == "__main__":
     text(upAvg)
     upMax = sam.upMax(mat)
     text(upMax)
-
     pool = maxPool(ks,step)
     poolMax = pool.forward(mat)
     text(poolMax)
-    
     pool = avgPool(ks,step)
     poolAvg = pool.forward(mat)
     text(poolAvg)
-    
     pad = padding((2,2))
     padMat = pad.forward(mat)
     text(padMat)
-
     con = conv(ks,step)
     conMat = con.forward(mat)
     text(conMat)
