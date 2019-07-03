@@ -12,7 +12,7 @@ def text(v):
     begin = text.find('text(')+len('text(')
     end = text.find(')',begin)
     print("\n{0}".format(text[begin:end])," shape:",np.shape(v)," type:",type(v))
-#    print(v)
+    #print(v)
 class transFun:
     def __init__(self,name = "sigmod"):
         self.funName = name
@@ -194,7 +194,7 @@ class fullyConnected:
         self.netIn = []
         self.inputShape = (0,0)
     def forward(self,matrix):
-#        text(matrix)
+        #text(matrix)
         self.inputShape = matrix.shape
         x = matrix.ravel()
         x = x.reshape(len(x),1)
@@ -259,10 +259,10 @@ class CNN:
 
 if __name__ == "__main__":
     mat = np.random.randint(0,9,(6,6))
-#    mat = np.random.uniform(0,9,(6,6))
+    #mat = np.random.uniform(0,9,(6,6))
     text(mat)
     ks = (2,2)
-#    kernel = np.random.randint(0,8,(2,2))
+    #kernel = np.random.randint(0,8,(2,2))
     step = 1
     sam = sample(ks,step)
     downMax = sam.downMax(mat)
